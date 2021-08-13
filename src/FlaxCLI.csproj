@@ -1,8 +1,26 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <OutputType>Exe</OutputType>
-    <TargetFramework>net5.0</TargetFramework>
-  </PropertyGroup>
+    <PropertyGroup>
+        <OutputType>Exe</OutputType>
+        <TargetFramework>net5.0</TargetFramework>
+        <PackAsTool>true</PackAsTool>
+        <ToolCommandName>flax</ToolCommandName>
+        <PackageOutputPath>..\nupkg</PackageOutputPath>
+        <!--<ApplicationIcon>Resources\Icon.ico</ApplicationIcon>-->
+        <Platforms>AnyCPU;x64</Platforms>
+        <Nullable>disable</Nullable>
+        <Title>FlaxCLI</Title>
+        <Authors>W2Wizard</Authors>
+        <Description>A command line interface for the Flax Engine, lets you manage your flax projects without a launcher.</Description>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <EmbeddedResource Include="Resources\Templates\Blank.7z" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="CommandLineParser" Version="2.8.0" />
+      <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+    </ItemGroup>
 
 </Project>
