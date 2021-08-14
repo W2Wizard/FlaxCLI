@@ -96,9 +96,7 @@ namespace FlaxCLI.Engine
 			projectInfo.ProjectPath = path;
 			projectInfo.ProjectFolderPath = Path.GetDirectoryName(path);
 			if (string.IsNullOrEmpty(projectInfo.Name))
-			{
 				throw new Exception("Missing project name.");
-			}
 			return projectInfo;
 		}
 

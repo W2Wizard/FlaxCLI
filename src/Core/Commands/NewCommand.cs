@@ -34,32 +34,27 @@ Usage:
 		{
 			var name = args[0];
 			var data = FlaxData.Load();
-			var dir = Path.Combine(Environment.CurrentDirectory, name);
+			var dirInfo = new DirectoryInfo(Path.Combine(Environment.CurrentDirectory, name));
 
 			if (!Regex.IsMatch(name, "^[a-zA-Z0-9_ ]+$"))
 			{
 				Console.WriteLine("Error: Name contains invalid characters.");
 				return;
 			}
-			if (Directory.Exists(dir) && Directory.GetFiles(dir).Any(file => Path.GetExtension(file) == ".flaxproj"))
+			if (dirInfo.Exists && dirInfo.GetFiles().Any(file => file.Extension == ".flaxproj"))
 			{
 				Console.WriteLine("Error: Current directory already contains a project.");
 				return;
 			}
-			if (data.Projects.ContainsKey(name))
+			if (dirInfo.Exists && data.Projects.ContainsKey(name))
 			{
-				if (Directory.Exists(dir))
-				{
-					Console.WriteLine("Error: Specified project already exists.");
-					return;
-				}
-				data.Projects.Remove(name); // TODO: This should not be required, we are adding it later again
+				Console.WriteLine("Error: Specified project already exists.");
+				return;
 			}
 
 			var template = data.GetTemplate();
 
 			// Arguments
-			// TODO: Error when specifiying argument but with no given value.
 			if (args.Length >= 3)
 			{
 				var cmd = args[1];
@@ -86,21 +81,28 @@ Usage:
 				}
 			}
 
-			if (Directory.Exists(dir))
-				return;
-			
-			Directory.CreateDirectory(dir);
-			ZipFile.ExtractToDirectory(template, dir);
+			if (!dirInfo.Exists)
+				dirInfo.Create();
 
-			var projectFile = Directory.GetFiles(dir).FirstOrDefault(file => Path.GetExtension(file) == ".flaxproj");
+			ZipFile.ExtractToDirectory(template, dirInfo.FullName);
+			var projectFile = dirInfo.GetFiles().FirstOrDefault(file => file.Extension == ".flaxproj");
 
-			var project = ProjectInfo.Load(projectFile);
+			var newPath = Path.Combine(dirInfo.FullName, $"{name}.flaxproj");
+			File.Move(projectFile.FullName, newPath);
+
+			var project = ProjectInfo.Load(newPath);
 			project.Name = name;
-			project.Save(Path.Combine(dir, $"{name}.flaxproj"));
+			project.Save(newPath);
 
-			File.Delete(projectFile);
-		
-			data.Projects.Add(name, dir);
+			if (data.Projects.ContainsKey(name))
+			{
+				data.Projects[name] = newPath;
+			}
+			else
+			{
+				data.Projects.Add(name, newPath);
+			}
+			
 			FlaxData.Save(data);
 
 			Console.ForegroundColor = ConsoleColor.Green;

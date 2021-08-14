@@ -39,10 +39,8 @@ namespace FlaxCLI.Core
 		/// <returns></returns>
 		public ProjectInfo GetProject(string name)
 		{
-			if (Projects.TryGetValue(name, out string path))
-			{
-				return ProjectInfo.Load(path);
-			}
+			if (Projects.TryGetValue(name, out string filePath))
+				return ProjectInfo.Load(filePath);
 			return null;
 		}
 
@@ -53,8 +51,8 @@ namespace FlaxCLI.Core
 		/// <returns></returns>
 		public string GetTemplate(string name = "Blank")
 		{	
-			Templates.TryGetValue(name, out string path);
-			return path;
+			Templates.TryGetValue(name, out string filePath);
+			return filePath;
 		}
 
 		/// <summary>
